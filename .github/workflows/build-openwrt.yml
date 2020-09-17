@@ -123,13 +123,6 @@ jobs:
       with:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: openwrt/bin
-        
-    - name: Upload DL directory #上传dl目录,仅一次，下次删除
-      uses: actions/upload-artifact@main
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
-      with:
-        name: OpenWrt_dl${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: openwrt/dl
 
     - name: Organize files #整理文件
       id: organize
