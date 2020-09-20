@@ -33,7 +33,7 @@ env:
   DIY_P2_SH: diy-part2.sh
   SSH_ACTIONS: true
   UPLOAD_BIN_DIR: true
-  UPLOAD_FIRMWARE: false
+  UPLOAD_FIRMWARE: true
   UPLOAD_COWTRANSFER: false
   UPLOAD_WETRANSFER: false
   TZ: Asia/Shanghai
@@ -87,10 +87,8 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
+#连接SSH
 
-    - name: SSH connection to Actions #连接SSH
-      uses: P3TERX/debugger-action@main
-      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
   
     - name: Download package #下载包
       id: package
@@ -111,7 +109,9 @@ jobs:
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "::set-env name=DEVICE_NAME::_$(cat DEVICE_NAME)"
         echo "::set-env name=FILE_DATE::_$(date +"%Y%m%d%H%M")"
-   
+    - name: SSH connection to Actions #连接SSH
+      uses: P3TERX/debugger-action@main
+      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')   
         
     - name: Check space usage #检查空间
       if: (!cancelled())
@@ -122,7 +122,7 @@ jobs:
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: openwrt
+        path: openwrt/bin
 
     - name: Organize files #整理文件
       id: organize
